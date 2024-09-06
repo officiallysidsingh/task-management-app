@@ -1,5 +1,15 @@
+// React Router DOM Imports
+import { HashRouter as Router } from "react-router-dom";
+
+// Components Imports
+import AppRouter from "./AppRouter.tsx";
+
 function App() {
-  return <div className="text-3xl font-bold underline">Hello World</div>;
+  return (
+    <Router>
+      <AppRouter />
+    </Router>
+  );
 }
 
 export default App;
