@@ -72,7 +72,11 @@ export default function LoginPage() {
                   render={({ field }) => (
                     <FormItem className="w-full">
                       <FormControl>
-                        <Input placeholder="Password" {...field} />
+                        <Input
+                          type="password"
+                          placeholder="Password"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
