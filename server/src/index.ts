@@ -1,11 +1,19 @@
+// Express Imports
 import express from "express";
+
+// Type Imports
 import type{ Express, Request, Response } from "express";
+
+// Config Imports
 import dotenv from "dotenv";
 import { connectDB } from "./config/dbConnection";
-import cors from "cors";
 
+// Middleware Imports
+import cors from "cors";
 import { errorHandler } from "./middleware/errorHandler"
 
+// Route Imports
+import { router as userRouter } from "./routes/userRoutes"
 
 // Load environment variables
 dotenv.config();
@@ -21,9 +29,9 @@ const PORT = process.env.PORT || 8000;
 
 // Middlewares
 app.use(cors({
-    origin: process.env.CLIENT_URL,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+  origin: process.env.CLIENT_URL,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }))
 app.use(express.json())
 
@@ -34,10 +42,10 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 // User Route
-app.use("/api/user")
+app.use("/api/user", userRouter)
 
 // CRUD Routes for Tasks
-app.use("/api/tasks")
+// app.use("/api/tasks")
 
 // Error Handling
 app.use(errorHandler);
