@@ -73,9 +73,9 @@ export default function SignupPage() {
     <div className="flex justify-center pt-20">
       <div className="w-5/6 md:w-1/3 flex flex-col gap-2">
         <div>
-          <h1 className="text-blue-600 text-xl font-bold">Signup</h1>
+          <h1 className="text-primary text-xl font-bold">Signup</h1>
         </div>
-        <div className="flex flex-col p-4 gap-2 border-2 border-blue-600 rounded-md shadow-md">
+        <div className="flex flex-col p-4 gap-2 border-2 border-primary rounded-md shadow-md">
           <Form {...signupForm}>
             <form onSubmit={signupForm.handleSubmit(signupUser)}>
               <div className="flex flex-col gap-2">
