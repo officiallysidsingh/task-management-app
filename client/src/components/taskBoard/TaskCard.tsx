@@ -9,9 +9,9 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 // Component Imports
-import DeleteDialog from "../dialogs/DeleteDialog";
-import EditDialog from "../dialogs/EditDialog";
-import ViewDetailsDialog from "../dialogs/ViewDetailsDialog";
+import DeleteTaskDialog from "../dialogs/DeleteTaskDialog";
+import EditTaskDialog from "../dialogs/EditTaskDialog";
+import ViewTaskDetailsDialog from "../dialogs/ViewTaskDetailsDialog";
 
 interface TaskCardProps {
   id: string;
@@ -96,17 +96,21 @@ export default function TaskCard({
             {/* Modals */}
             <div>
               {openDelete && (
-                <DeleteDialog
+                <DeleteTaskDialog
                   taskId={id}
                   open={openDelete}
                   setOpen={setOpenDelete}
                 />
               )}
               {openEdit && (
-                <EditDialog taskId={id} open={openEdit} setOpen={setOpenEdit} />
+                <EditTaskDialog
+                  taskId={id}
+                  open={openEdit}
+                  setOpen={setOpenEdit}
+                />
               )}
               {openViewDetails && (
-                <ViewDetailsDialog
+                <ViewTaskDetailsDialog
                   taskId={id}
                   open={openViewDetails}
                   setOpen={setOpenViewDetails}

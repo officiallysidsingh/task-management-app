@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 
 // Component Imports
+import AddTaskDialog from "@/components/dialogs/AddTaskDialog";
 import Board from "@/components/taskBoard/Board";
 import TaskCard from "@/components/taskBoard/TaskCard";
 
@@ -71,10 +72,16 @@ const initialTasks: Task[] = [
 ];
 
 export default function HomePage() {
+  const [openAdd, setOpenAdd] = useState(false);
   const [sortType, setSortType] = useState("recent");
 
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
+
+  // For adding task
+  const handleAddTask = () => {
+    setOpenAdd(true);
+  };
 
   const changeSortType = (value: string) => {
     setSortType(value);
@@ -167,7 +174,13 @@ export default function HomePage() {
     >
       <div className="flex flex-col p-5 gap-4">
         <div className="w-full">
-          <Button className="w-full md:w-40">Add Task</Button>
+          {/* Action Button */}
+          <Button className="w-full md:w-40" onClick={handleAddTask}>
+            Add Task
+          </Button>
+
+          {/* Modal */}
+          {openAdd && <AddTaskDialog open={openAdd} setOpen={setOpenAdd} />}
         </div>
         <div className="w-full flex flex-col md:flex-row justify-between shadow-md rounded-md gap-y-4 p-4 border border-muted">
           <div className="w-2/3 md:w-2/5 flex justify-center items-center gap-2">

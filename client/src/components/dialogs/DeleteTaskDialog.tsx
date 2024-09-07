@@ -13,7 +13,7 @@ import {
   AlertDialogTitle,
 } from "../ui/alert-dialog";
 
-export default function DeleteDialog({
+export default function DeleteTaskDialog({
   taskId,
   open,
   setOpen,

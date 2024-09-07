@@ -36,7 +36,7 @@ const editTaskSchema = z.object({
   description: z.string(),
 });
 
-export default function EditDialog({
+export default function EditTaskDialog({
   taskId,
   open,
   setOpen,

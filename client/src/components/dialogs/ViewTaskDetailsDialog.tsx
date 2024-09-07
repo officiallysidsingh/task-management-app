@@ -4,7 +4,7 @@ import { Dispatch, SetStateAction } from "react";
 // ShadCN Imports
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 
-export default function ViewDetailsDialog({
+export default function ViewTaskDetailsDialog({
   taskId,
   open,
   setOpen,
