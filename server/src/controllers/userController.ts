@@ -6,6 +6,7 @@ import { User } from "../models/userModel";
 
 // Package Imports
 import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
 
 // Register a user
 // POST /api/user/register
@@ -43,6 +44,42 @@ export const registerUser = async(req: Request, res: Response, next: NextFunctio
     } else {
       res.status(400);
       throw new Error("Invalid user data")
+    }
+  } catch (error) {
+    next(error)
+  }
+}
+
+// Login a user
+// POST /api/user/login
+// Public access
+export const loginUser = async(req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      res.status(400);
+      throw new Error("Please fill all the fields");
+    }
+
+    //Identify if user present in db
+    const user = await User.findOne({ email });
+
+    //compare password with hashed password
+    if (user && (await bcrypt.compare(password, user.password))) {
+      const accessToken = jwt.sign(
+        {
+          user: {
+            email: user.email,
+            id: user.id,
+          },
+        },
+        process.env.ACCESS_TOKEN_SECRET!,
+        { expiresIn: "15m" }
+      );
+      res.status(200).json({ accessToken });
+    } else {
+      res.status(401);
+      throw new Error("Invalid email or password");
     }
   } catch (error) {
     next(error)
