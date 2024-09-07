@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-// React Hook Form Import
+// React Hook Form Imports
 import { useForm } from "react-hook-form";
 
 // ShadCN Imports
@@ -36,6 +36,7 @@ export default function LoginPage() {
     },
   });
 
+  // TODO:
   function loginUser(values: z.infer<typeof loginSchema>) {
     console.log(values);
   }

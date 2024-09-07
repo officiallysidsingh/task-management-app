@@ -24,8 +24,9 @@ import {
   DragOverEvent,
   DragOverlay,
   DragStartEvent,
-  PointerSensor,
+  MouseSensor,
   rectIntersection,
+  TouchSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -80,9 +81,15 @@ export default function HomePage() {
   };
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
+    useSensor(MouseSensor, {
       activationConstraint: {
         distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
       },
     })
   );
@@ -159,16 +166,16 @@ export default function HomePage() {
       onDragCancel={handleDragCancel}
     >
       <div className="flex flex-col p-5 gap-4">
-        <div>
-          <Button className="px-12">Add Task</Button>
+        <div className="w-full">
+          <Button className="w-full md:w-40">Add Task</Button>
         </div>
-        <div className="w-full flex justify-between shadow-md rounded-md px-2 py-4 border border-muted">
-          <div className="w-2/5 flex justify-center items-center gap-2">
-            <p className="font-bold">Search</p>
+        <div className="w-full flex flex-col md:flex-row justify-between shadow-md rounded-md gap-y-4 p-4 border border-muted">
+          <div className="w-2/3 md:w-2/5 flex justify-center items-center gap-2">
+            <p>Search:</p>
             <Input type="text" placeholder="Search..." />
           </div>
-          <div className="w-2/5 md:w-1/5 flex justify-center items-center gap-2">
-            <p className="font-bold whitespace-nowrap">Sort By</p>
+          <div className="w-1/2 md:w-1/5 flex justify-center items-center gap-2">
+            <p className="whitespace-nowrap">Sort By:</p>
             <Select onValueChange={changeSortType}>
               <SelectTrigger>
                 <SelectValue placeholder="Select" />

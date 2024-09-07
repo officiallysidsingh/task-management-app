@@ -1,9 +1,17 @@
+// React Imports
+import { useState } from "react";
+
 // ShadCN Imports
 import { Button } from "../ui/button";
 
 // Dnd Kit Imports
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+
+// Component Imports
+import DeleteDialog from "../dialogs/DeleteDialog";
+import EditDialog from "../dialogs/EditDialog";
+import ViewDetailsDialog from "../dialogs/ViewDetailsDialog";
 
 interface TaskCardProps {
   id: string;
@@ -20,6 +28,10 @@ export default function TaskCard({
   createdAt,
   isDragging,
 }: TaskCardProps) {
+  const [openDelete, setOpenDelete] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [openViewDetails, setOpenViewDetails] = useState(false);
+
   const {
     attributes,
     listeners,
@@ -35,6 +47,21 @@ export default function TaskCard({
     opacity: isSortableDragging ? 0.5 : 1,
   };
 
+  // For deleting task
+  const handleDeleteTask = () => {
+    setOpenDelete(true);
+  };
+
+  // For editing task
+  const handleEditTask = () => {
+    setOpenEdit(true);
+  };
+
+  // For viewing task
+  const handleViewTaskDetails = () => {
+    setOpenViewDetails(true);
+  };
+
   const cardContent = (
     <>
       <div>
@@ -44,15 +71,49 @@ export default function TaskCard({
       <div>
         <p className="text-sm">Created at: {createdAt}</p>
         {!isDragging && (
-          <div className="flex justify-end gap-2">
-            <Button size="sm" className="bg-red-500 hover:bg-red-400">
-              Delete
-            </Button>
-            <Button size="sm" className="bg-primary/75 hover:bg-primary/65">
-              Edit
-            </Button>
-            <Button size="sm">View Details</Button>
-          </div>
+          <>
+            {/* Action Buttons */}
+            <div className="flex justify-end gap-2">
+              <Button
+                size="sm"
+                className="bg-red-500 hover:bg-red-400"
+                onClick={handleDeleteTask}
+              >
+                Delete
+              </Button>
+              <Button
+                size="sm"
+                className="bg-primary/75 hover:bg-primary/65"
+                onClick={handleEditTask}
+              >
+                Edit
+              </Button>
+              <Button size="sm" onClick={handleViewTaskDetails}>
+                View Details
+              </Button>
+            </div>
+
+            {/* Modals */}
+            <div>
+              {openDelete && (
+                <DeleteDialog
+                  taskId={id}
+                  open={openDelete}
+                  setOpen={setOpenDelete}
+                />
+              )}
+              {openEdit && (
+                <EditDialog taskId={id} open={openEdit} setOpen={setOpenEdit} />
+              )}
+              {openViewDetails && (
+                <ViewDetailsDialog
+                  taskId={id}
+                  open={openViewDetails}
+                  setOpen={setOpenViewDetails}
+                />
+              )}
+            </div>
+          </>
         )}
       </div>
     </>
