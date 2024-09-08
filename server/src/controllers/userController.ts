@@ -1,5 +1,6 @@
 // Type Imports
 import type { NextFunction, Request, Response } from "express";
+import { AuthRequest } from "../types/authRequest";
 
 // Schema Imports
 import { User } from "../models/userModel";
@@ -85,3 +86,20 @@ export const loginUser = async(req: Request, res: Response, next: NextFunction) 
     next(error)
   }
 }
+
+// Current user information
+// GET /api/users/current
+// private
+export const currentUser = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const user = await User.findById(req?.user?.id, { password: 0, updatedAt: 0 })
+
+    if (!user) {
+      res.status(404)
+      throw new Error("User not found")
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    next(error)
+  }
+};
