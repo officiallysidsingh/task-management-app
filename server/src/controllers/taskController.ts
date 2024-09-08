@@ -99,3 +99,33 @@ export const updateTask = async (
     next(error);
   }
 };
+
+// Delete task
+// DELETE /api/task/:id
+// Private access
+export const deleteTask = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    // Check if task exists
+    const task = await Task.findById(req.params.id);
+    if (!task) {
+      res.status(404);
+      throw new Error("Task not found");
+    }
+
+    // Check if task is of same user
+    if (task?.user_id.toString() !== req?.user?.id.toString()) {
+      res.status(403);
+      throw new Error(
+        "User doesn't have permission to delete other user's tasks!"
+      );
+    }
+
+    await Task.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({ message: "Task deleted successfully!" });
+  } catch (error) {}
+};

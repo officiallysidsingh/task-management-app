@@ -7,6 +7,7 @@ import {
   getTask,
   addTask,
   updateTask,
+  deleteTask,
 } from "../controllers/taskController";
 
 // Middleware Imports
@@ -20,4 +21,4 @@ router.use(validateToken);
 
 router.route("/").get(getTasks).post(addTask);
 
-router.route("/:id").get(getTask).put(updateTask);
+router.route("/:id").get(getTask).put(updateTask).delete(deleteTask);
