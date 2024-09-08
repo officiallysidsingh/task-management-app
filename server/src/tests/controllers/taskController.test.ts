@@ -4,11 +4,11 @@ import {
   addTask,
   updateTask,
   deleteTask,
-} from "../../src/controllers/taskController";
-import { Task } from "../../src/models/taskModel";
+} from "../../controllers/taskController";
+import { Task } from "../../models/taskModel";
 
 // Mock the Task model
-jest.mock("../../src/models/taskModel");
+jest.mock("../../models/taskModel");
 
 describe("Task Controllers", () => {
   let req: any, res: any, next: any;

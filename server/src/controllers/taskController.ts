@@ -120,9 +120,7 @@ export const updateTask = async (
     }
 
     // Update task
-    const updatedTask = await Task.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
+    const updatedTask = await Task.findByIdAndUpdate(req.params.id, req.body);
 
     res.status(200).json(updatedTask);
   } catch (error) {

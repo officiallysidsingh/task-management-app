@@ -3,16 +3,16 @@ import {
   loginUser,
   currentUser,
   googleLogin,
-} from "../../src/controllers/userController";
-import { User } from "../../src/models/userModel";
-import { Auth } from "../../src/models/authModel";
+} from "../../controllers/userController";
+import { User } from "../../models/userModel";
+import { Auth } from "../../models/authModel";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
 
 // Mock dependencies
-jest.mock("../../src/models/userModel");
-jest.mock("../../src/models/authModel");
+jest.mock("../../models/userModel");
+jest.mock("../../models/authModel");
 jest.mock("bcrypt");
 jest.mock("jsonwebtoken");
 jest.mock("google-auth-library", () => {
