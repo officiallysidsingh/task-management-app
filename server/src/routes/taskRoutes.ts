@@ -2,7 +2,7 @@
 import express from "express";
 
 // Controller Imports
-import { getTasks } from "../controllers/taskController";
+import { getTasks, getTask } from "../controllers/taskController";
 
 // Middleware Imports
 import validateToken from "../middleware/validateTokenHandler";
@@ -14,3 +14,5 @@ export const router = express.Router();
 router.use(validateToken);
 
 router.route("/").get(getTasks);
+
+router.route("/:id").get(getTask);
