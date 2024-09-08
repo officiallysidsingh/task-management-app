@@ -2,6 +2,9 @@
 import { Route, Routes } from "react-router-dom";
 
 // Page Imports
+// Protected Routes
+import ProtectedRoutes from "./pages/protected/ProtectedRoutes.tsx";
+
 // Layout
 import Layout from "./Layout.tsx";
 
@@ -19,7 +22,9 @@ export default function AppRouter() {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
-        <Route index element={<HomePage />} />
+        <Route element={<ProtectedRoutes />}>
+          <Route index element={<HomePage />} />
+        </Route>
         <Route path="login" element={<LoginPage />} />
         <Route path="signup" element={<SignupPage />} />
       </Route>

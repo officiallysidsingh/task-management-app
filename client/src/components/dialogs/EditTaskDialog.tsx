@@ -90,7 +90,7 @@ export default function EditTaskDialog({
   function editTask(values: z.infer<typeof editTaskSchema>) {
     axiosInstance
       .put(`/tasks/${taskId}`, values)
-      .then((response) => {
+      .then(() => {
         // Toast
         toast.success("Task edited successfully!");
 
