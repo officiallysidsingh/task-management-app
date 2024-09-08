@@ -4,6 +4,7 @@ import { AuthRequest } from "../types/authRequest";
 
 // Schema Imports
 import { User } from "../models/userModel";
+import { Auth } from "../models/authModel";
 
 // Package Imports
 import bcrypt from "bcrypt";
@@ -41,10 +42,15 @@ export const registerUser = async (
       firstName,
       lastName,
       email,
+    });
+
+    // Create user in auth collection
+    const auth = await Auth.create({
+      user_id: user._id,
       password: hashedPassword,
     });
 
-    if (user) {
+    if (user && auth) {
       res.status(201).json({ message: "User registered successfully" });
     } else {
       res.status(400);
@@ -70,25 +76,35 @@ export const loginUser = async (
       throw new Error("Please fill all the fields");
     }
 
-    //Identify if user present in db
+    // Check if user present in db
     const user = await User.findOne({ email });
 
-    //compare password with hashed password
-    if (user && (await bcrypt.compare(password, user.password))) {
-      const accessToken = jwt.sign(
-        {
-          user: {
-            email: user.email,
-            id: user.id,
+    if (user) {
+      // Check user's auth
+      const auth = await Auth.findById(user._id);
+
+      if (!auth) {
+        res.status(404);
+        throw new Error("Use Signin By Google Option");
+      }
+
+      //compare password with hashed password
+      if (await bcrypt.compare(password, auth.password)) {
+        const accessToken = jwt.sign(
+          {
+            user: {
+              email: user.email,
+              id: user.id,
+            },
           },
-        },
-        process.env.ACCESS_TOKEN_SECRET!,
-        { expiresIn: "15m" }
-      );
-      res.status(200).json({ accessToken });
-    } else {
-      res.status(401);
-      throw new Error("Invalid email or password");
+          process.env.ACCESS_TOKEN_SECRET!,
+          { expiresIn: "15m" }
+        );
+        res.status(200).json({ accessToken });
+      } else {
+        res.status(401);
+        throw new Error("Invalid email or password");
+      }
     }
   } catch (error) {
     next(error);
@@ -105,7 +121,6 @@ export const currentUser = async (
 ) => {
   try {
     const user = await User.findById(req?.user?.id, {
-      password: 0,
       updatedAt: 0,
     });
 

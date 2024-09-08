@@ -14,10 +14,6 @@ const userSchema = new Schema(
       required: [true, "Please add the user's email address"],
       unique: [true, "Email address already exists"],
     },
-    password: {
-      type: String,
-      required: [true, "Please add the user's password"],
-    },
   },
   {
     timestamps: true,
