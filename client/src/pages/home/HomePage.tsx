@@ -21,7 +21,6 @@ import TaskCard from "@/components/taskBoard/TaskCard";
 import { arrayMove, SortableContext } from "@dnd-kit/sortable";
 import {
   DndContext,
-  DragEndEvent,
   DragOverEvent,
   DragOverlay,
   DragStartEvent,
@@ -193,7 +192,7 @@ export default function HomePage() {
     }
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = () => {
     // Reset activeTask state
     setActiveTask(null);
   };
@@ -238,7 +237,7 @@ export default function HomePage() {
           </div>
           <div className="w-1/2 md:w-1/5 flex justify-center items-center gap-2">
             <p className="whitespace-nowrap">Sort By:</p>
-            <Select onValueChange={changeSortType}>
+            <Select value={sortType} onValueChange={changeSortType}>
               <SelectTrigger>
                 <SelectValue placeholder="Select" />
               </SelectTrigger>
