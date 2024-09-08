@@ -14,27 +14,34 @@ export const validateToken = async (
   let token;
   let authHeader = req.headers["x-access-token"] || req.headers.authorization;
 
-  if (
-    authHeader &&
-    typeof authHeader === "string" &&
-    authHeader.startsWith("Bearer")
-  ) {
-    // Get the auth token
-    token = authHeader.split(" ")[1];
+  try {
+    if (
+      authHeader &&
+      typeof authHeader === "string" &&
+      authHeader.startsWith("Bearer")
+    ) {
+      // Get the auth token
+      token = authHeader.split(" ")[1];
 
-    // Verify the auth token
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!, (err, decoded) => {
-      if (err || !decoded) {
+      // Verify the auth token
+      jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!, (err, decoded) => {
+        if (err || !decoded) {
+          res.status(401);
+          throw new Error("Unauthorized User");
+        }
+        req.user = (decoded as JwtPayload).user;
+        next();
+      });
+      if (!token) {
         res.status(401);
         throw new Error("Unauthorized User");
       }
-      req.user = (decoded as JwtPayload).user;
-      next();
-    });
-    if (!token) {
+    } else {
       res.status(401);
       throw new Error("Unauthorized User");
     }
+  } catch (error) {
+    next(error);
   }
 };
 
