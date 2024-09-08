@@ -1,5 +1,5 @@
 // React Router Imports
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 // Zod Imports
 import { z } from "zod";
@@ -19,6 +19,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+// Axios Imports
+import axiosInstance from "@/config/axiosInstance";
+import { AxiosError } from "axios";
+
+// Types Imports
+import ApiErrorResponse from "@/interfaces/axiosError";
+
+// Context Imports
+import { useAuth } from "@/AuthContext";
+
+// Toast Imports
+import { toast } from "sonner";
+
 const loginSchema = z.object({
   email: z.string().email(),
   password: z
@@ -28,6 +41,10 @@ const loginSchema = z.object({
 });
 
 export default function LoginPage() {
+  const { saveToken } = useAuth();
+
+  const navigate = useNavigate();
+
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -36,14 +53,24 @@ export default function LoginPage() {
     },
   });
 
-  // TODO:
   function loginUser(values: z.infer<typeof loginSchema>) {
-    console.log(values);
+    axiosInstance
+      .post("/user/login", values)
+      .then((response) => {
+        saveToken(response?.data?.accessToken);
+        navigate("/");
+      })
+      .catch((error: AxiosError<ApiErrorResponse>) => {
+        if (error?.response?.status !== 500) {
+          toast.error(error?.response?.data?.message);
+        } else {
+          toast.error("Error! Something Went Wrong!");
+        }
+      });
   }
 
-  function loginUserWithGoogle() {
-    console.log("Login with google");
-  }
+  // TODO:
+  function loginUserWithGoogle() {}
 
   return (
     <div className="flex justify-center pt-20">

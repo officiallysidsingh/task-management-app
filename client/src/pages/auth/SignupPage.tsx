@@ -1,5 +1,5 @@
 // React Router Imports
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 // Zod Imports
 import { z } from "zod";
@@ -18,6 +18,16 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+
+// Axios Imports
+import { AxiosError } from "axios";
+import axiosInstance from "@/config/axiosInstance";
+
+// Type Imports
+import ApiErrorResponse from "@/interfaces/axiosError";
+
+// Toast Imports
+import { toast } from "sonner";
 
 const signupSchema = z
   .object({
@@ -50,6 +60,8 @@ const signupSchema = z
   });
 
 export default function SignupPage() {
+  const navigate = useNavigate();
+
   const signupForm = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -62,9 +74,22 @@ export default function SignupPage() {
   });
 
   function signupUser(values: z.infer<typeof signupSchema>) {
-    console.log(values);
+    axiosInstance
+      .post("/user/register", values)
+      .then((response) => {
+        toast.success(response?.data?.message);
+        navigate("/login");
+      })
+      .catch((error: AxiosError<ApiErrorResponse>) => {
+        if (error?.response?.status !== 500) {
+          toast.error(error?.response?.data?.message);
+        } else {
+          toast.error("Error! Something Went Wrong!");
+        }
+      });
   }
 
+  // TODO:
   function signupUserWithGoogle() {
     console.log("Signup User With Google");
   }
