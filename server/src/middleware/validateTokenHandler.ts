@@ -12,9 +12,13 @@ export const validateToken = async (
   next: NextFunction
 ) => {
   let token;
-  let authHeader = req.headers['x-access-token'] || req.headers.authorization;
+  let authHeader = req.headers["x-access-token"] || req.headers.authorization;
 
-  if (authHeader && typeof authHeader === "string" && authHeader.startsWith("Bearer")) {
+  if (
+    authHeader &&
+    typeof authHeader === "string" &&
+    authHeader.startsWith("Bearer")
+  ) {
     // Get the auth token
     token = authHeader.split(" ")[1];
 

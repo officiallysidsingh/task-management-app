@@ -1,7 +1,12 @@
 // Type Imports
-import type { Request, Response, NextFunction } from "express"
+import type { Request, Response, NextFunction } from "express";
 
-export const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
+export const errorHandler = (
+  err: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const statusCode = res.statusCode ? res.statusCode : 500;
 
   switch (statusCode) {
@@ -28,7 +33,7 @@ export const errorHandler = (err: Error, req: Request, res: Response, next: Next
         stackTrace: err.stack,
       });
       break;
-    
+
     case 403:
       res.json({
         title: "Forbidden",
@@ -36,7 +41,7 @@ export const errorHandler = (err: Error, req: Request, res: Response, next: Next
         stackTrace: err.stack,
       });
       break;
-    
+
     case 500:
       res.json({
         title: "Server Error",

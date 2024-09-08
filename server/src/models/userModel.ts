@@ -7,7 +7,7 @@ const userSchema = new Schema(
       required: [true, "Please add the user's first name"],
     },
     lastName: {
-      type: String
+      type: String,
     },
     email: {
       type: String,
@@ -21,9 +21,9 @@ const userSchema = new Schema(
   },
   {
     timestamps: {
-      updatedAt: false
+      updatedAt: false,
     },
   }
-)
+);
 
-export const User = model("User", userSchema)
+export const User = model("User", userSchema);
