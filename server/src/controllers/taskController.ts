@@ -33,3 +33,34 @@ export const getTask = async (
     next(error);
   }
 };
+
+// Add new task
+// POST /api/task
+// Private access
+export const addTask = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { title, description } = req.body;
+
+    if (!title) {
+      res.status(401);
+      throw new Error("Please enter title");
+    }
+
+    const task = await Task.create({
+      title,
+      description,
+      status: "todo",
+      user_id: req?.user?.id,
+    });
+
+    if (task) {
+      res.status(201).json(task);
+    }
+  } catch (error) {
+    next(error);
+  }
+};
