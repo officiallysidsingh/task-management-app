@@ -1,3 +1,6 @@
+// React Imports
+import { Dispatch, SetStateAction } from "react";
+
 // Component Imports
 import TaskCard from "./TaskCard";
 
@@ -8,21 +11,20 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 
-interface Task {
-  id: string;
-  title: string;
-  description: string;
-  status: string;
-  createdAt: string;
-}
+// Type Imports
+import { Task } from "@/interfaces/taskBoard";
 
-interface BoardProps {
+export default function Board({
+  id,
+  containerType,
+  tasks,
+  setTasks,
+}: {
   id: string;
   containerType: string;
   tasks: Task[];
-}
-
-export default function Board({ id, containerType, tasks }: BoardProps) {
+  setTasks: Dispatch<SetStateAction<Task[]>>;
+}) {
   const { setNodeRef } = useDroppable({ id });
 
   return (
@@ -42,6 +44,7 @@ export default function Board({ id, containerType, tasks }: BoardProps) {
               title={task.title}
               description={task.description}
               createdAt={task.createdAt}
+              setTasks={setTasks}
             />
           ))}
         </div>

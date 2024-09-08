@@ -1,5 +1,5 @@
 // React Imports
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 
 // ShadCN Imports
 import { Button } from "../ui/button";
@@ -13,13 +13,8 @@ import DeleteTaskDialog from "../dialogs/DeleteTaskDialog";
 import EditTaskDialog from "../dialogs/EditTaskDialog";
 import ViewTaskDetailsDialog from "../dialogs/ViewTaskDetailsDialog";
 
-interface TaskCardProps {
-  id: string;
-  title: string;
-  description: string;
-  createdAt: string;
-  isDragging?: boolean;
-}
+// Type Imports
+import { Task } from "@/interfaces/taskBoard";
 
 export default function TaskCard({
   id,
@@ -27,7 +22,15 @@ export default function TaskCard({
   description,
   createdAt,
   isDragging,
-}: TaskCardProps) {
+  setTasks,
+}: {
+  id: string;
+  title: string;
+  description: string;
+  createdAt: Date;
+  isDragging?: boolean;
+  setTasks: Dispatch<SetStateAction<Task[]>>;
+}) {
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openViewDetails, setOpenViewDetails] = useState(false);
@@ -69,7 +72,17 @@ export default function TaskCard({
         <p className="text-base">{description}</p>
       </div>
       <div>
-        <p className="text-sm">Created at: {createdAt}</p>
+        <p className="text-sm">
+          Created at:{" "}
+          {new Date(createdAt).toLocaleString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false, // For 24-hour format
+          })}
+        </p>
         {!isDragging && (
           <>
             {/* Action Buttons */}
@@ -100,6 +113,7 @@ export default function TaskCard({
                   taskId={id}
                   open={openDelete}
                   setOpen={setOpenDelete}
+                  setTasks={setTasks}
                 />
               )}
               {openEdit && (
@@ -107,6 +121,7 @@ export default function TaskCard({
                   taskId={id}
                   open={openEdit}
                   setOpen={setOpenEdit}
+                  setTasks={setTasks}
                 />
               )}
               {openViewDetails && (
