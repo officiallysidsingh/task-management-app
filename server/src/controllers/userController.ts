@@ -10,6 +10,15 @@ import { Auth } from "../models/authModel";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+// Google Auth Imports
+import { OAuth2Client } from "google-auth-library";
+
+// Initialize Google OAuth client
+const client = new OAuth2Client(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET
+);
+
 // Register a user
 // POST /api/user/register
 // Public access
@@ -46,7 +55,7 @@ export const registerUser = async (
 
     // Create user in auth collection
     const auth = await Auth.create({
-      user_id: user._id,
+      user_id: user.id,
       password: hashedPassword,
     });
 
@@ -81,7 +90,7 @@ export const loginUser = async (
 
     if (user) {
       // Check user's auth
-      const auth = await Auth.findById(user._id);
+      const auth = await Auth.findOne({ user_id: user.id });
 
       if (!auth) {
         res.status(404);
@@ -90,6 +99,7 @@ export const loginUser = async (
 
       //compare password with hashed password
       if (await bcrypt.compare(password, auth.password)) {
+        // Create access token
         const accessToken = jwt.sign(
           {
             user: {
@@ -98,7 +108,7 @@ export const loginUser = async (
             },
           },
           process.env.ACCESS_TOKEN_SECRET!,
-          { expiresIn: "15m" }
+          { expiresIn: "30m" }
         );
         res.status(200).json({ accessToken });
       } else {
@@ -129,6 +139,64 @@ export const currentUser = async (
       throw new Error("User not found");
     }
     res.status(200).json(user);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Google Login
+// POST /api/user/login/google
+// Public access
+export const googleLogin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { idToken } = req.body;
+
+    if (!idToken) {
+      res.status(400);
+      throw new Error("Google ID token is required");
+    }
+
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    if (!payload) {
+      res.status(400);
+      throw new Error("Invalid Google ID token");
+    }
+
+    const { email, given_name: firstName, family_name: lastName } = payload;
+
+    // Check if user exists
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = await User.create({
+        firstName,
+        lastName,
+        email,
+      });
+    }
+
+    // Generate JWT token
+    const accessToken = jwt.sign(
+      {
+        user: {
+          email: user.email,
+          id: user.id,
+        },
+      },
+      process.env.ACCESS_TOKEN_SECRET!,
+      { expiresIn: "15m" }
+    );
+
+    res.status(200).json({ accessToken });
   } catch (error) {
     next(error);
   }

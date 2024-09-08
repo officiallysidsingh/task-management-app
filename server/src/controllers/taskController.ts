@@ -9,7 +9,17 @@ import { Task } from "../models/taskModel";
 // GET /api/task
 // Private access
 export const getTasks = async (req: AuthRequest, res: Response) => {
-  const tasks = await Task.find({ user_id: req?.user?.id });
+  const tasks = await Task.find(
+    { user_id: req?.user?.id },
+    {
+      _id: 0,
+      id: "$_id",
+      title: 1,
+      description: 1,
+      status: 1,
+      createdAt: 1,
+    }
+  );
   res.status(200).json(tasks);
 };
 
@@ -29,7 +39,16 @@ export const getTask = async (
       throw new Error("Task not found!");
     }
 
-    res.status(200).json(task);
+    // Convert task._id to task.id before returning
+    const taskResponse = {
+      id: task._id,
+      title: task.title,
+      description: task.description,
+      status: task.status,
+      user_id: task.user_id,
+    };
+
+    res.status(200).json(taskResponse);
   } catch (error) {
     next(error);
   }
@@ -59,8 +78,17 @@ export const addTask = async (
       user_id: req?.user?.id,
     });
 
+    // Convert task._id to task.id before returning
+    const taskResponse = {
+      id: task._id,
+      title: task.title,
+      description: task.description,
+      status: task.status,
+      user_id: task.user_id,
+    };
+
     if (task) {
-      res.status(201).json(task);
+      res.status(201).json(taskResponse);
     }
   } catch (error) {
     next(error);
@@ -92,7 +120,9 @@ export const updateTask = async (
     }
 
     // Update task
-    const updatedTask = await Task.findByIdAndUpdate(req.params.id, req.body);
+    const updatedTask = await Task.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
 
     res.status(200).json(updatedTask);
   } catch (error) {
@@ -127,5 +157,7 @@ export const deleteTask = async (
     await Task.findByIdAndDelete(req.params.id);
 
     res.status(200).json({ message: "Task deleted successfully!" });
-  } catch (error) {}
+  } catch (error) {
+    next(error);
+  }
 };
