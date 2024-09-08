@@ -1,5 +1,5 @@
 // React Imports
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
 
 // Zod Imports
 import { z } from "zod";
@@ -28,6 +28,17 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Label } from "../ui/label";
 
+// Type Imports
+import { Task } from "@/interfaces/taskBoard";
+import axiosInstance from "@/config/axiosInstance";
+
+// Axios Imports
+import ApiErrorResponse from "@/interfaces/axiosError";
+import { AxiosError } from "axios";
+
+// Toast Imports
+import { toast } from "sonner";
+
 const editTaskSchema = z.object({
   title: z
     .string()
@@ -40,22 +51,75 @@ export default function EditTaskDialog({
   taskId,
   open,
   setOpen,
+  setTasks,
 }: {
   taskId: string;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  setTasks: Dispatch<SetStateAction<Task[]>>;
 }) {
   const editTaskForm = useForm<z.infer<typeof editTaskSchema>>({
     resolver: zodResolver(editTaskSchema),
     defaultValues: {
-      title: "Task 6", // {task.title}
-      description: "Description 6", // {task.description}
+      title: "",
+      description: "",
     },
   });
 
+  const { reset } = editTaskForm;
+
+  useEffect(() => {
+    axiosInstance
+      .get(`/tasks/${taskId}`)
+      .then((response) =>
+        reset({
+          title: response?.data?.title || "",
+          description: response?.data?.description || "",
+        })
+      )
+      .catch((error: AxiosError<ApiErrorResponse>) => {
+        if (error?.response?.status !== 500) {
+          toast.error(error?.response?.data?.message);
+        } else {
+          toast.error("Error! Something Went Wrong!");
+        }
+      });
+  }, [taskId]);
+
   // TODO:
   function editTask(values: z.infer<typeof editTaskSchema>) {
-    console.log(values);
+    axiosInstance
+      .put(`/tasks/${taskId}`, values)
+      .then((response) => {
+        // Toast
+        toast.success("Task edited successfully!");
+
+        reset({
+          title: "",
+          description: "",
+        });
+
+        // Refetch tasks
+        axiosInstance
+          .get("/tasks")
+          .then((response) => {
+            setTasks(response?.data);
+          })
+          .catch((error: AxiosError<ApiErrorResponse>) => {
+            if (error?.response?.status !== 500) {
+              toast.error(error?.response?.data?.message);
+            } else {
+              toast.error("Error! Something Went Wrong!");
+            }
+          });
+      })
+      .catch((error: AxiosError<ApiErrorResponse>) => {
+        if (error?.response?.status !== 500) {
+          toast.error(error?.response?.data?.message);
+        } else {
+          toast.error("Error! Something Went Wrong!");
+        }
+      });
 
     // Close the dialog box
     setOpen(false);

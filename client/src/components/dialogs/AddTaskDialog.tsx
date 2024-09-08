@@ -26,6 +26,17 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 
+// Axios Imports
+import axiosInstance from "@/config/axiosInstance";
+import { AxiosError } from "axios";
+
+// Type Imports
+import ApiErrorResponse from "@/interfaces/axiosError";
+import { Task } from "@/interfaces/taskBoard";
+
+// Toast Imports
+import { toast } from "sonner";
+
 const addTaskSchema = z.object({
   title: z
     .string()
@@ -37,21 +48,34 @@ const addTaskSchema = z.object({
 export default function AddTaskDialog({
   open,
   setOpen,
+  setTasks,
 }: {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  setTasks: Dispatch<SetStateAction<Task[]>>;
 }) {
   const addTaskForm = useForm<z.infer<typeof addTaskSchema>>({
     resolver: zodResolver(addTaskSchema),
     defaultValues: {
-      title: "", // {task.title}
-      description: "", // {task.description}
+      title: "",
+      description: "",
     },
   });
 
-  // TODO:
   function addTask(values: z.infer<typeof addTaskSchema>) {
-    console.log(values);
+    axiosInstance
+      .post("/tasks", values)
+      .then((response) => {
+        setTasks((prev) => [...prev, response?.data]);
+        toast.success("Task added successfully!");
+      })
+      .catch((error: AxiosError<ApiErrorResponse>) => {
+        if (error?.response?.status !== 500) {
+          toast.error(error?.response?.data?.message);
+        } else {
+          toast.error("Error! Something Went Wrong!");
+        }
+      });
 
     // Close the dialog box
     setOpen(false);
