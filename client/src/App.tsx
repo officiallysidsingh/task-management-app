@@ -5,15 +5,18 @@ import { HashRouter as Router } from "react-router-dom";
 import AppRouter from "./AppRouter.tsx";
 
 // Context Imports
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import AuthProvider from "./AuthContext.tsx";
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AppRouter />
-      </Router>
-    </AuthProvider>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+      <AuthProvider>
+        <Router>
+          <AppRouter />
+        </Router>
+      </AuthProvider>
+    </GoogleOAuthProvider>
   );
 }
 

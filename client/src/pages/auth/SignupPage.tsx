@@ -29,6 +29,12 @@ import ApiErrorResponse from "@/interfaces/axiosError";
 // Toast Imports
 import { toast } from "sonner";
 
+// Google OAuth Imports
+import { GoogleLogin } from "@react-oauth/google";
+
+// Context Imports
+import { useAuth } from "@/AuthContext";
+
 const signupSchema = z
   .object({
     firstName: z
@@ -62,6 +68,8 @@ const signupSchema = z
 export default function SignupPage() {
   const navigate = useNavigate();
 
+  const { saveToken } = useAuth();
+
   const signupForm = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -89,10 +97,30 @@ export default function SignupPage() {
       });
   }
 
-  // TODO:
-  function signupUserWithGoogle() {
-    console.log("Signup User With Google");
-  }
+  const handleGoogleLoginSuccess = (credentialResponse: any) => {
+    axiosInstance
+      .post("/user/login/google", { idToken: credentialResponse.credential })
+      .then((response) => {
+        // Save access token
+        saveToken(response.data.accessToken);
+
+        // Go to homepage
+        navigate("/");
+
+        toast.success("Successfully signed in with Google");
+      })
+      .catch((error: AxiosError<ApiErrorResponse>) => {
+        if (error?.response?.status !== 500) {
+          toast.error(error?.response?.data?.message);
+        } else {
+          toast.error("Error! Something Went Wrong!");
+        }
+      });
+  };
+
+  const handleGoogleLoginError = () => {
+    toast.error("Google Sign-In failed");
+  };
 
   return (
     <div className="flex justify-center pt-20">
@@ -184,11 +212,11 @@ export default function SignupPage() {
                 Login
               </Link>
             </p>
-            <Button onClick={signupUserWithGoogle}>
-              <p>
-                Signup with<span className="font-bold"> Google</span>
-              </p>
-            </Button>
+            <GoogleLogin
+              onSuccess={handleGoogleLoginSuccess}
+              onError={handleGoogleLoginError}
+              useOneTap
+            />
           </div>
         </div>
       </div>

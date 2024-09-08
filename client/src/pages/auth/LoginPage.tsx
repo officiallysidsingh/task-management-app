@@ -32,6 +32,9 @@ import { useAuth } from "@/AuthContext";
 // Toast Imports
 import { toast } from "sonner";
 
+// GoogleOAuth Imports
+import { GoogleLogin } from "@react-oauth/google";
+
 const loginSchema = z.object({
   email: z.string().email(),
   password: z
@@ -57,8 +60,13 @@ export default function LoginPage() {
     axiosInstance
       .post("/user/login", values)
       .then((response) => {
+        // Save access token
         saveToken(response?.data?.accessToken);
+
+        // Go to homepage
         navigate("/");
+
+        toast.success("Successfully signed in");
       })
       .catch((error: AxiosError<ApiErrorResponse>) => {
         if (error?.response?.status !== 500) {
@@ -69,8 +77,30 @@ export default function LoginPage() {
       });
   }
 
-  // TODO:
-  function loginUserWithGoogle() {}
+  const handleGoogleLoginSuccess = (credentialResponse: any) => {
+    axiosInstance
+      .post("/user/login/google", { idToken: credentialResponse.credential })
+      .then((response) => {
+        // Save access token
+        saveToken(response.data.accessToken);
+
+        // Go to homepage
+        navigate("/");
+
+        toast.success("Successfully signed in with Google");
+      })
+      .catch((error: AxiosError<ApiErrorResponse>) => {
+        if (error?.response?.status !== 500) {
+          toast.error(error?.response?.data?.message);
+        } else {
+          toast.error("Error! Something Went Wrong!");
+        }
+      });
+  };
+
+  const handleGoogleLoginError = () => {
+    toast.error("Google Sign-In failed");
+  };
 
   return (
     <div className="flex justify-center pt-20">
@@ -122,11 +152,11 @@ export default function LoginPage() {
                 Signup
               </Link>
             </p>
-            <Button onClick={loginUserWithGoogle}>
-              <p>
-                Login with<span className="font-bold"> Google</span>
-              </p>
-            </Button>
+            <GoogleLogin
+              onSuccess={handleGoogleLoginSuccess}
+              onError={handleGoogleLoginError}
+              useOneTap
+            />
           </div>
         </div>
       </div>
